@@ -84,6 +84,10 @@ std::vector<gmsh_physical> read_physical_names(std::ifstream &infile) {
 
   for (auto i = 0; i < n_names; i++) {
     infile >> phys_names[i].dim >> phys_names[i].tag >> phys_names[i].name;
+    if(phys_names[i].name[0] == '\"' && phys_names[i].name[phys_names[i].name.size() - 1] == '\"'){    
+      std::string str = phys_names[i].name.substr(1, phys_names[i].name.size() - 2);
+      phys_names[i].name = str;
+    }
   }
   seek_string(infile, "$EndPhysicalNames");
   return phys_names;

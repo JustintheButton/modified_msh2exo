@@ -97,7 +97,7 @@ msh2exo::IntermediateMesh msh2exo::read_gmsh_sdk_file(std::string filepath) {
 
   imesh.n_blocks = n_blocks;
   imesh.blocks.resize(n_blocks);
-  std::vector<std::set<size_t>> node_set(n_blocks);
+  //std::vector<std::set<size_t>> node_set(n_blocks);
   std::vector<std::set<size_t>> elem_set(n_blocks);
   size_t block_index = 0;
   for (size_t i = 0; i < dim_tags.size(); i++) {
@@ -120,6 +120,7 @@ msh2exo::IntermediateMesh msh2exo::read_gmsh_sdk_file(std::string filepath) {
           }
         }
       }
+      /*	
       for (size_t j = 0; j < phys_elems[i].size(); j++) {
         for (size_t k = 0; k < phys_elems[i][j].elem_node_tags.size(); k++) {
           for (size_t m = 0; m < phys_elems[i][j].elem_node_tags[k].size();
@@ -128,10 +129,11 @@ msh2exo::IntermediateMesh msh2exo::read_gmsh_sdk_file(std::string filepath) {
           }
         }
       }
+      */
       block_index++;
     }
   }
-
+  /*
   std::map<size_t, int64_t> node_index_map;
   int64_t node_index = 0;
   for (int64_t block = 0; block < n_blocks; block++) {
@@ -141,6 +143,7 @@ msh2exo::IntermediateMesh msh2exo::read_gmsh_sdk_file(std::string filepath) {
       }
     }
   }
+  */
   std::map<size_t, int64_t> elem_index_map;
   int64_t elem_index = 0;
   for (int64_t block = 0; block < n_blocks; block++) {

@@ -10,6 +10,7 @@
 #include <fmt/printf.h>
 #include <map>
 #include <set>
+#include <string>
 
 extern "C" {
 #include <exodusII.h>
@@ -114,7 +115,7 @@ void msh2exo::write_mesh(const IntermediateMesh &imesh,
 
   msh2exo::print_if(options.verbose, "{}: Initializing exodus\n", output);
   ex_put_init(exoid, title, imesh.dim, imesh.n_nodes, imesh.n_elements,
-              imesh.n_blocks, imesh.boundaries.size(), n_side_sets);
+              imesh.n_blocks, 0, n_side_sets);
 
   std::time_t tm = std::time(nullptr);
 
@@ -171,23 +172,14 @@ void msh2exo::write_mesh(const IntermediateMesh &imesh,
   } else {
     ex_put_coord(exoid, x_coords.data(), y_coords.data(), z_coords.data());
   }
-
-  msh2exo::print_if(options.verbose, "{}: inserting nodesets\n", output);
-  // node sets
-  for (size_t i = 0; i < imesh.boundaries.size(); i++) {
-    ex_put_set_param(exoid, EX_NODE_SET, imesh.boundaries[i].tag,
-                     imesh.boundaries[i].nodes.size(), 0);
-    std::vector<int> ns_nodes(imesh.boundaries[i].nodes.begin(),
-                              imesh.boundaries[i].nodes.end());
-    std::transform(ns_nodes.begin(), ns_nodes.end(), ns_nodes.begin(),
-                   [](auto &val) { return val + 1; });
-    ex_put_set(exoid, EX_NODE_SET, imesh.boundaries[i].tag, ns_nodes.data(), 0);
-    ex_put_name(exoid, EX_NODE_SET, imesh.boundaries[i].tag,
-                imesh.boundaries[i].name.c_str());
-    msh2exo::print_if(options.verbose, "\t NS {} (id {}): {} nodes\n",
-                      imesh.boundaries[i].name, imesh.boundaries[i].tag,
-                      ns_nodes.size());
-  }
+  
+  //generating names for nodesets to bs through Poseidon
+  for(size_t i = 0; i < imesh.boundaries.size(); i++){
+    ex_put_set_param(exoid, EX_NODE_SET, imesh.boundaries[i].tag, 0, 0);
+    std::vector<int> ns_nodes(imesh.boundaries[i].nodes.begin(), imesh.boundaries[i].nodes.end());
+    std::transform(ns_nodes.begin(), ns_nodes.end(), ns_nodes.begin(), [](auto&val){return val + 1;});
+    ex_put_name(exoid, EX_NODE_SET, imesh.boundaries[i].tag, std::to_string(i).c_str());
+}  
 
   msh2exo::print_if(options.verbose, "{}: inserting sidesets\n", output);
   // side sets
